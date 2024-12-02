@@ -8,6 +8,7 @@ var builder = Host.CreateApplicationBuilder(args);
 builder.AddServiceDefaults();
 builder.AddAzureBlobClient("blobs");
 builder.AddAzureServiceBusClient("service-bus");
+builder.AddAzureOpenAIClient("openai");
 
 builder.Services.AddHostedService<Worker>();
 

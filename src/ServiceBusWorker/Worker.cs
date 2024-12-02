@@ -2,17 +2,21 @@ using System.Text;
 using Azure.Identity;
 using Azure.Messaging.ServiceBus;
 using Azure.Storage.Blobs;
+using OpenAI;
+using OpenAI.Chat;
 
 namespace ServiceBusWorker
 {
     public class Worker(ILogger<Worker> logger,
                         BlobServiceClient blobServiceClient,
                         ServiceBusClient _serviceBusClient,
+                        OpenAIClient openAIClient,
                         IConfiguration configuration) : BackgroundService
     {
         private readonly ILogger<Worker> _logger = logger;
         private readonly ServiceBusClient _client = _serviceBusClient;
         private readonly BlobServiceClient _blobServiceClient = blobServiceClient;
+        private readonly OpenAIClient _openAIClient = openAIClient;
         private ServiceBusProcessor _processor = null!; // Initialize with null-forgiving operator
         private readonly IConfiguration _configuration = configuration;
 
@@ -46,6 +50,8 @@ namespace ServiceBusWorker
 
         private async Task MessageHandler(ProcessMessageEventArgs args)
         {
+            // TODO: Do some code cleanup!!
+
             string body = args.Message.Body.ToString();
             _logger.LogInformation($"Received message: {body}");
 
@@ -66,6 +72,17 @@ namespace ServiceBusWorker
             {
                 await blobClient.UploadAsync(stream, true);
             }
+
+            string deploymentName = _configuration["AZURE_OPENAI_DEPLOYMENT_NAME"] ?? throw new InvalidOperationException("Deployment name is not configured.");
+
+            ChatClient chatClient = _openAIClient.GetChatClient(deploymentName);
+            ChatCompletion completion = await chatClient.CompleteChatAsync([
+                new SystemChatMessage("You're a helpful assistant that talks like a pirate."),
+                new UserChatMessage(body)
+                // new UserChatMessage("What's your favorite color?")
+            ]);
+
+            _logger.LogInformation($"Role: {completion.Role}. Chat response: {completion.Content[0].Text}");
 
             // Complete the message. Messages are deleted from the queue.
             await args.CompleteMessageAsync(args.Message);

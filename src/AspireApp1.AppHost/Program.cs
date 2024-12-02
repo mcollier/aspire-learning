@@ -7,6 +7,7 @@ string queueName = builder.Configuration["Parameters:service-bus-queue-name"] ??
 // Needed for Service Bus client using DefaultAzureCredential when using Azure subscription and a secondary tenant.
 string tenantId = builder.Configuration["Parameters:AZURE_TENANT_ID"] ?? throw new InvalidOperationException("AZURE_TENANT_ID is not defined");
 
+string deploymentName = builder.Configuration["Parameters:openai-deployment-name"] ?? throw new InvalidOperationException("openai-deployment-name is not defined");
 
 // Get reference to existing Blob storage endpoint.
 var blobs = builder.AddConnectionString("blobs");
@@ -14,12 +15,18 @@ var blobs = builder.AddConnectionString("blobs");
 // Get reference to existing Service Bus namespace.
 var serviceBus = builder.AddConnectionString("service-bus");
 
-builder.AddProject<Projects.WebApplication1>("WebApplication1");
+// Get a reference to Azure OpenAI endpoint.
+var openAI = builder.AddConnectionString("openai");
+
+builder.AddProject<Projects.WebApplication1>("WebApplication1")
+    .WithReference(openAI);
 
 builder.AddProject<Projects.ServiceBusWorker>("ServiceBusWorker")
     .WithReference(blobs)
     .WithReference(serviceBus)
+    .WithReference(openAI)
     .WithEnvironment("AZURE_SERVICE_BUS_QUEUE_NAME", queueName)
+    .WithEnvironment("AZURE_OPENAI_DEPLOYMENT_NAME", deploymentName)
     .WithEnvironment("AZURE_TENANT_ID", tenantId);
 
 
