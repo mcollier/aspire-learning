@@ -8,6 +8,7 @@ Set the following in the *appsettings.Development.json* file:
 {
   "Parameters": {
     "service-bus-queue-name": "YOUR-SERVICE-BUS-QUEUE-NAME",
+    "openai-deployment-name": "YOUR-AZURE-OPENAI-DEPLOYMENT NAME",
     "AZURE_TENANT_ID": "YOUR-ENTRAID-TENANT-ID"
   },
   "ConnectionStrings": {
