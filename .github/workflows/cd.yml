@@ -46,14 +46,17 @@ jobs:
         #     # username: ${{ secrets.ACR_USERNAME }}
         #     # password: ${{ secrets.ACR_PASSWORD }}
         - run: |
-            az acr login --name ${{ vars.ACR_NAME }}.azurecr.io
+            az acr login --name ${{ vars.ACR_NAME }}
         
         #  Create alias for the image
         - name: Create alias for the ServiceBusWorker
           run: |
-            docker tag service-bus-worker ${{ vars.ACR_NAME }}.azurecr.io/service-bus-worker:${{ github.sha }}
+            docker tag service-bus-worker:${{ github.sha }} ${{ vars.ACR_NAME }}.azurecr.io/service-bus-worker:${{ github.sha }}
 
         #  Push to ACR
+        - name: Push ServiceBusWorker image to Azure Container Registry
+          run: |
+            docker push ${{ vars.ACR_NAME }}.azurecr.io/service-bus-worker:${{ github.sha }}
 
         # - name: Push Docker image to Docker Hub
         #   env:
