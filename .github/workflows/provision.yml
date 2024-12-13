@@ -35,4 +35,4 @@ jobs:
             scope: subscription
             subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
             template-file: ./infra/main.bicep
-            parameters: '{"environmentName": "", "location": "eastus"}'
+            parameters: '{"environmentName": "${{vars.ENVIRONMENT_NAME}}", "location": "eastus"}'
