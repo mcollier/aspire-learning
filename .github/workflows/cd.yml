@@ -3,7 +3,9 @@ name: CD
 on:
     workflow_dispatch:
     push:
-        # branches:
+        branches:
+            main
+
 permissions:
     id-token: write
     contents: read
@@ -33,16 +35,18 @@ jobs:
           working-directory: src/ServiceBusWorker
 
         - name: Build Docker image for ServiceBusWorker
-          run: dotnet publish --os linux --arch x64 /t:PublishContainer
+          run: dotnet publish --os linux --arch x64 /t:PublishContainer -p ContainerImageTag="${{ github.sha }}"
           working-directory: src/ServiceBusWorker
 
         #  Log into existing Azure Container Registry
-        - name: Log into Azure Container Registry
-          uses: azure/docker-login@v1
-          with:
-            login-server: ${{ vars.ACR_NAME }}.azurecr.io
-            # username: ${{ secrets.ACR_USERNAME }}
-            # password: ${{ secrets.ACR_PASSWORD }}
+        # - name: Log into Azure Container Registry
+        #   uses: azure/docker-login@v1
+        #   with:
+        #     login-server: ${{ vars.ACR_NAME }}.azurecr.io
+        #     # username: ${{ secrets.ACR_USERNAME }}
+        #     # password: ${{ secrets.ACR_PASSWORD }}
+        - run: |
+            az acr login --name ${{ vars.ACR_NAME }}.azurecr.io
         
         #  Create alias for the image
         - name: Create alias for the ServiceBusWorker
