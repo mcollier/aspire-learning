@@ -29,8 +29,9 @@
 	"customizations": {
 		"vscode": {
 			"extensions": [
+				"azurite.azurite",
 				"ms-dotnettools.csdevkit@prerelease",
-				"azurite.azurite"
+				"github.vscode-github-actions"
 			],
 			"settings": {
 				"dotnet.defaultSolution": "src/AspireApp1.sln"
