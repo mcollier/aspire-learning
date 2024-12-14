@@ -24,7 +24,7 @@ resource acr 'Microsoft.ContainerRegistry/registries@2023-07-01' existing = {
 }
 
 resource storageAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
-  name: 'storageRoleAssignment'
+  name: guid(storage.id, principalId, storageRoleDefinitionId)
   scope: storage
   properties: {
     roleDefinitionId: storageRoleDefinitionId
@@ -34,7 +34,7 @@ resource storageAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' 
 }
 
 resource serviceBusAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
-  name: 'serviceBusRoleAssignment'
+  name: guid(serviceBusNamespace.id, principalId, serviceBusRoleDefinitionId)
   scope: serviceBusNamespace
   properties: {
     roleDefinitionId: serviceBusRoleDefinitionId
@@ -44,7 +44,7 @@ resource serviceBusAssignment 'Microsoft.Authorization/roleAssignments@2022-04-0
 }
 
 resource acrAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
-  name: 'acrRoleAssignment'
+  name: guid(acr.id, principalId, acrRoleDefinitionId)
   scope: acr
   properties: {
     roleDefinitionId: acrRoleDefinitionId
