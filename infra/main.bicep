@@ -87,8 +87,26 @@ module userAssignedIdentityRoleAssignment 'modules/role-assignment.bicep' = {
   }
 }
 
+module sbNamespace 'br/public:avm/res/service-bus/namespace:0.10.1' = {
+  name: 'sbNamespaceDeployment'
+  scope: rg
+  params: {
+    name: '${abbrs.serviceBusNamespaces}${resourceToken}'
+  }
+}
+
+module storageAccount 'br/public:avm/res/storage/storage-account:0.15.0' = {
+  name: 'storageAccountDeployment'
+  scope: rg
+  params: {
+    name: '${abbrs.storageStorageAccounts}${resourceToken}'
+    allowBlobPublicAccess: false
+    publicNetworkAccess: 'Enabled'
+  }
+}
+
 output RESOURCE_GROUP_NAME string = rg.name
 output ACR_NAME string = acr.outputs.name
 output USER_ASSIGNED_IDENTITY_NAME string = userAssignedIdentity.outputs.name
 output MANAGED_ENVIRONMENT_NAME string = managedEnvironment.outputs.name
-// output SERVICE_BUS_ENDPOINT string = sb
+output SERVICE_BUS_ENDPOINT string = sbNamespace.outputs.name
