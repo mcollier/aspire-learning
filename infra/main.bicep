@@ -86,3 +86,9 @@ module userAssignedIdentityRoleAssignment 'modules/role-assignment.bicep' = {
     assignmentName: guid(rg.id, userAssignedIdentity.outputs.principalId, acrPullRole)
   }
 }
+
+output RESOURCE_GROUP_NAME string = rg.name
+output ACR_NAME string = acr.outputs.name
+output USER_ASSIGNED_IDENTITY_NAME string = userAssignedIdentity.outputs.name
+output MANAGED_ENVIRONMENT_NAME string = managedEnvironment.outputs.name
+// output SERVICE_BUS_ENDPOINT string = sb
