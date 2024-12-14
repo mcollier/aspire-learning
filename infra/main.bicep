@@ -106,6 +106,11 @@ module sbNamespace 'br/public:avm/res/service-bus/namespace:0.10.1' = {
   scope: rg
   params: {
     name: '${abbrs.serviceBusNamespaces}${resourceToken}'
+    queues: [
+      {
+        name: 'widgets'
+      }
+    ]
   }
 }
 
@@ -116,13 +121,6 @@ module storageAccount 'br/public:avm/res/storage/storage-account:0.15.0' = {
     name: '${abbrs.storageStorageAccounts}${resourceToken}'
     allowBlobPublicAccess: false
     publicNetworkAccess: 'Enabled'
-    queueServices: {
-      queues: [
-        {
-          name: 'widgets'
-        }
-      ]
-    }
   }
 }
 
