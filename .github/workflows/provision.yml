@@ -30,7 +30,7 @@ jobs:
           with:
             type: deployment
             operation: create
-            name: 'AspireLearingInfraDeployment-${{ github.run_id }}'
+            name: 'AspireLearningInfraDeployment-${{ github.run_id }}'
             location: eastus
             scope: subscription
             subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
