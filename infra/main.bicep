@@ -32,6 +32,7 @@ var storageBlobDataOwnerRole = resourceId(
   'Microsoft.Authorization/roleDefinitions',
   'b7e6dc6d-f1e8-4753-8033-0f276bb0955b'
 )
+var sbDataReceiverRole = resourceId('Microsoft.Authorization/roleDefinitions', '4f6d3b9b-027b-4f4c-9142-0e5a2a2247e0')
 
 var abbrs = loadJsonContent('abbreviations.json')
 var resourceToken = toLower(uniqueString(subscription().id, environmentName, location))
@@ -98,6 +99,16 @@ module userAssignedIdentityRoleAssignmentStorage 'modules/role-assignment.bicep'
     principalId: userAssignedIdentity.outputs.principalId
     roleDefinitionId: storageBlobDataOwnerRole
     assignmentName: guid(rg.id, userAssignedIdentity.outputs.principalId, storageBlobDataOwnerRole)
+  }
+}
+
+module uaiRoleAssignmentServiceBusDataReceiver 'modules/role-assignment.bicep' = {
+  scope: rg
+  name: 'uaiRoleAssignmentServiceBusDataReceiver'
+  params: {
+    principalId: userAssignedIdentity.outputs.principalId
+    roleDefinitionId: sbDataReceiverRole
+    assignmentName: guid(rg.id, userAssignedIdentity.outputs.principalId, sbDataReceiverRole)
   }
 }
 
