@@ -50,11 +50,15 @@ jobs:
           run: |
             docker push ${{ vars.ACR_NAME }}.azurecr.io/service-bus-worker:${{ github.sha }}
 
-        # - name: Push Docker image to Docker Hub
-        #   env:
-        #     DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
-        #     DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
-        #   run: |
-        #     echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin
-        #     docker tag myapp:latest $DOCKER_USERNAME/myapp:latest
-        #     docker push $DOCKER_USERNAME/myapp:latest
+        - name: Deploy ServiceBusWorker to Container App
+          uses: azure/bicep-deploy@v1
+          with:
+            type: deployment
+            operation: create
+            name: ServiceBusWorkerDeployment
+            location: eastus
+            scope: resource-group
+            subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+            resource-group-name: ${{ vars.RESOURCE_GROUP_NAME }}
+            template-file: ./infra/worker-app.bicep
+            parameters: '{"blobConnectionString": "${{ vars.INFRA_STORAGE_ACCOUNT_NAME}}.blob.core.windows.net", "imageName": "${{ vars.ACR_NAME }}.azurecr.io/service-bus-worker:${{ github.sha }}", "managedEnvironmentName": "${{ vars.ENVIRONMENT_NAME }}", "openAIConnectionString": "https://${{vars.INFRA_AZURE_OPENAI_NAME}}.openai.azure.com/", "openAIModelDeploymentName": "${{vars.INFRA_AZURE_OPENAI_MODEL_DEPLOYMENT_NAME}}", "registryName": "${{vars.ACR_NAME}}", "serviceBusConnectionString": "${{vars.INFRA_SERVICE_BUS_NAMESPACE_NAME}}.servicebus.windows.net", "serviceBusQueueName": "${{vars.INFRA_SERVICE_BUS_QUEUE_NAME}}", "userAssignedIdentityName": "${{vars.RESOURCE_GROUP_NAME}}"}'
