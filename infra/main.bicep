@@ -28,6 +28,10 @@ param logAnalyticsWorkspaceName string = ''
 param resourceGroupName string = ''
 
 var acrPullRole = resourceId('Microsoft.Authorization/roleDefinitions', '7f951dda-4ed3-4680-a7ca-43fe172d538d')
+var storageBlobDataOwnerRole = resourceId(
+  'Microsoft.Authorization/roleDefinitions',
+  'b7e6dc6d-f1e8-4753-8033-0f276bb0955b'
+)
 
 var abbrs = loadJsonContent('abbreviations.json')
 var resourceToken = toLower(uniqueString(subscription().id, environmentName, location))
@@ -77,13 +81,23 @@ module userAssignedIdentity 'br/public:avm/res/managed-identity/user-assigned-id
   }
 }
 
-module userAssignedIdentityRoleAssignment 'modules/role-assignment.bicep' = {
+module userAssignedIdentityRoleAssignmentAcr 'modules/role-assignment.bicep' = {
   scope: rg
-  name: 'userAssignedIdentityRoleAssignmentDeployment'
+  name: 'userAssignedIdentityRoleAssignmentDeploymentAcr'
   params: {
     principalId: userAssignedIdentity.outputs.principalId
     roleDefinitionId: acrPullRole
     assignmentName: guid(rg.id, userAssignedIdentity.outputs.principalId, acrPullRole)
+  }
+}
+
+module userAssignedIdentityRoleAssignmentStorage 'modules/role-assignment.bicep' = {
+  scope: rg
+  name: 'userAssignedIdentityRoleAssignmentDeploymentStorage'
+  params: {
+    principalId: userAssignedIdentity.outputs.principalId
+    roleDefinitionId: storageBlobDataOwnerRole
+    assignmentName: guid(rg.id, userAssignedIdentity.outputs.principalId, storageBlobDataOwnerRole)
   }
 }
 
@@ -102,6 +116,13 @@ module storageAccount 'br/public:avm/res/storage/storage-account:0.15.0' = {
     name: '${abbrs.storageStorageAccounts}${resourceToken}'
     allowBlobPublicAccess: false
     publicNetworkAccess: 'Enabled'
+    queueServices: {
+      queues: [
+        {
+          name: 'widgets'
+        }
+      ]
+    }
   }
 }
 
