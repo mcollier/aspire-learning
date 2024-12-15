@@ -37,6 +37,7 @@ var storageBlobDataOwnerRole = resourceId(
 //   'ba92f5b4-2d11-453d-a403-e96b0029c9fe'
 // )
 var sbDataReceiverRole = resourceId('Microsoft.Authorization/roleDefinitions', '4f6d3b9b-027b-4f4c-9142-0e5a2a2247e0')
+var sbDataSenderRole = resourceId('Microsoft.Authorization/roleDefinitions', '69a216fc-b8fb-44d8-bc22-1f3c2cd27a39')
 
 var abbrs = loadJsonContent('abbreviations.json')
 var resourceToken = toLower(uniqueString(subscription().id, environmentName, location))
@@ -94,7 +95,8 @@ module roleAssignments 'modules/role-assignment.bicep' = {
     storageAccountName: storageAccount.outputs.name
     storageRoleDefinitionId: storageBlobDataOwnerRole
     serviceBusNamespaceName: sbNamespace.outputs.name
-    serviceBusRoleDefinitionId: sbDataReceiverRole
+    serviceBusReceiverRoleDefinitionId: sbDataReceiverRole
+    serviceBusSenderRoleDefinitionId: sbDataSenderRole
     acrName: acr.outputs.name
     acrRoleDefinitionId: acrPullRole
   }

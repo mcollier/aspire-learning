@@ -55,6 +55,7 @@ jobs:
            "serviceBusQueueName": "${{vars.INFRA_SERVICE_BUS_QUEUE_NAME}}",
            "userAssignedIdentityName": "${{vars.USER_ASSIGNED_IDENTITY_NAME}}"
            }'
+
       - name: Deploy Web App to Container App
         uses: azure/bicep-deploy@v1
         with:
@@ -68,10 +69,10 @@ jobs:
           parameters: '{
            "imageName": "${{ vars.INFRA_ACR_NAME }}.azurecr.io/service-bus-worker:${{ github.sha }}",
            "managedEnvironmentName": "${{ vars.INFRA_MANAGED_ENVIRONMENT_NAME }}",
-           "userAssignedIdentityName": "${{vars.USER_ASSIGNED_IDENTITY_NAME}}"
+           "userAssignedIdentityName": "${{vars.USER_ASSIGNED_IDENTITY_NAME}}",
            "registryName": "${{vars.INFRA_ACR_NAME}}",
            "serviceBusConnectionString": "${{vars.INFRA_SERVICE_BUS_NAMESPACE_NAME}}.servicebus.windows.net",
-           "serviceBusQueueName": "${{vars.INFRA_SERVICE_BUS_QUEUE_NAME}}",
+           "serviceBusQueueName": "${{vars.INFRA_SERVICE_BUS_QUEUE_NAME}}"
            }'
 
       - name: Azure CLI logout

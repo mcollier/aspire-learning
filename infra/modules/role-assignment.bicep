@@ -4,7 +4,8 @@ param storageAccountName string
 param storageRoleDefinitionId string
 
 param serviceBusNamespaceName string
-param serviceBusRoleDefinitionId string
+param serviceBusSenderRoleDefinitionId string
+param serviceBusReceiverRoleDefinitionId string
 
 param acrName string
 param acrRoleDefinitionId string
@@ -31,11 +32,21 @@ resource storageAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' 
   }
 }
 
-resource serviceBusAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
-  name: guid(serviceBusNamespace.id, principalId, serviceBusRoleDefinitionId)
+resource serviceBusReceiverAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
+  name: guid(serviceBusNamespace.id, principalId, serviceBusReceiverRoleDefinitionId)
   scope: serviceBusNamespace
   properties: {
-    roleDefinitionId: serviceBusRoleDefinitionId
+    roleDefinitionId: serviceBusReceiverRoleDefinitionId
+    principalId: principalId
+    principalType: 'ServicePrincipal'
+  }
+}
+
+resource serviceBusSenderAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
+  name: guid(serviceBusNamespace.id, principalId, serviceBusSenderRoleDefinitionId)
+  scope: serviceBusNamespace
+  properties: {
+    roleDefinitionId: serviceBusSenderRoleDefinitionId
     principalId: principalId
     principalType: 'ServicePrincipal'
   }
@@ -50,4 +61,3 @@ resource acrAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
     principalType: 'ServicePrincipal'
   }
 }
-
