@@ -3,14 +3,10 @@ name: Continuous Deployment
 on:
   # Allow triggering manually. 
   workflow_dispatch:
-  push:
-      # branches:
-      #   - main
 
 permissions:
     id-token: write
     contents: read
-                # - main
 jobs:
   ci:
     uses: ./.github/workflows/ci.yml
