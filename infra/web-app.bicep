@@ -23,7 +23,7 @@ module webApp 'br/public:avm/res/app/container-app:0.11.0' = {
   name: 'webAppDeployment'
   params: {
     environmentResourceId: environment.id
-    name: 'worker-app'
+    name: 'web-app'
     managedIdentities: {
       userAssignedResourceIds: [uai.id]
     }
