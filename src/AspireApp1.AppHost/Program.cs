@@ -19,7 +19,9 @@ var serviceBus = builder.AddConnectionString("service-bus");
 var openAI = builder.AddConnectionString("openai");
 
 builder.AddProject<Projects.WebApplication1>("WebApplication1")
-    .WithReference(openAI);
+    .WithReference(serviceBus)
+    .WithReference(openAI)
+    .WithEnvironment("AZURE_SERVICE_BUS_QUEUE_NAME", queueName);
 
 builder.AddProject<Projects.ServiceBusWorker>("ServiceBusWorker")
     .WithReference(blobs)
