@@ -67,7 +67,7 @@ jobs:
           resource-group-name: ${{ vars.RESOURCE_GROUP_NAME }}
           template-file: ./infra/web-app.bicep
           parameters: '{
-           "imageName": "${{ vars.INFRA_ACR_NAME }}.azurecr.io/service-bus-worker:${{ github.sha }}",
+           "imageName": "${{ vars.INFRA_ACR_NAME }}.azurecr.io/web-app:${{ github.sha }}",
            "managedEnvironmentName": "${{ vars.INFRA_MANAGED_ENVIRONMENT_NAME }}",
            "userAssignedIdentityName": "${{vars.USER_ASSIGNED_IDENTITY_NAME}}",
            "registryName": "${{vars.INFRA_ACR_NAME}}",
