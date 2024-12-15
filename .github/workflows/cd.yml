@@ -19,6 +19,7 @@ jobs:
   push_to_acr:
     needs: [deploy_infra]
     uses: ./.github/workflows/build_and_push.yml
+    secrets: inherit
 
   deploy_to_container_app:
     needs: [push_to_acr]
