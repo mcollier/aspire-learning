@@ -9,6 +9,7 @@ on:
   
   # On any PR.
   pull_request:
+  push:
 
 jobs:
   dotnet_build:
