@@ -13,18 +13,3 @@ on:
 jobs:
   dotnet_build:
     uses: ./.github/workflows/build_dotnet.yml
-    # build:
-    #     runs-on: ubuntu-latest
-
-    #     steps:
-    #     - name: Checkout repository
-    #       uses: actions/checkout@main
-
-    #     - name: Setup .NET
-    #       uses: actions/setup-dotnet@v2
-    #       with:
-    #         dotnet-version: '9.0.x'
-
-    #     - name: Build
-    #       run: dotnet build --configuration Release
-    #       working-directory: src
