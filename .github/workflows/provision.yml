@@ -1,10 +1,15 @@
 name: Provision Azure resources
 
 on: 
-    workflow_dispatch:
-    push:
-      branches:
-        - main
+  # Allow to be called from other workflows.
+  workflow_call:
+
+  # Allow triggering manually. 
+  workflow_dispatch:
+  
+  push:
+    branches:
+      - main
 
 permissions:
     id-token: write
