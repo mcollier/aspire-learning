@@ -14,6 +14,7 @@ jobs:
   deploy_infra:
     needs: [ci]
     uses: ./.github/workflows/provision.yml
+    secrets: inherit
 
   push_to_acr:
     needs: [deploy_infra]
