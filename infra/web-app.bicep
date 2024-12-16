@@ -35,6 +35,7 @@ module webApp 'br/public:avm/res/app/container-app:0.11.0' = {
         server: acr.properties.loginServer
       }
     ]
+    ingressTargetPort: 8080
     containers: [
       {
         image: imageName

@@ -30,6 +30,7 @@ module workerApp 'br/public:avm/res/app/container-app:0.11.0' = {
     managedIdentities: {
       userAssignedResourceIds: [uai.id]
     }
+    disableIngress: true
     scaleMinReplicas: 1
     scaleMaxReplicas: 5
     registries: [

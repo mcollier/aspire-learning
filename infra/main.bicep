@@ -32,10 +32,6 @@ var storageBlobDataOwnerRole = resourceId(
   'Microsoft.Authorization/roleDefinitions',
   'b7e6dc6d-f1e8-4753-8033-0f276bb0955b'
 )
-// var storageBlobDataContributorRole = resourceId(
-//   'Microsoft.Authorization/roleDefinitions',
-//   'ba92f5b4-2d11-453d-a403-e96b0029c9fe'
-// )
 var sbDataReceiverRole = resourceId('Microsoft.Authorization/roleDefinitions', '4f6d3b9b-027b-4f4c-9142-0e5a2a2247e0')
 var sbDataSenderRole = resourceId('Microsoft.Authorization/roleDefinitions', '69a216fc-b8fb-44d8-bc22-1f3c2cd27a39')
 
@@ -46,6 +42,10 @@ var resourceToken = toLower(uniqueString(subscription().id, environmentName, loc
 resource rg 'Microsoft.Resources/resourceGroups@2021-04-01' = {
   name: !empty(resourceGroupName) ? resourceGroupName : '${abbrs.resourcesResourceGroups}${environmentName}'
   location: location
+}
+
+resource rgAi 'Microsoft.Resources/resourceGroups@2021-04-01' existing = {
+  name: 'rg-openai-upskilling'
 }
 
 module workspace 'br/public:avm/res/operational-insights/workspace:0.9.0' = {
@@ -99,6 +99,14 @@ module roleAssignments 'modules/role-assignment.bicep' = {
     serviceBusSenderRoleDefinitionId: sbDataSenderRole
     acrName: acr.outputs.name
     acrRoleDefinitionId: acrPullRole
+  }
+}
+
+module aiRoleAssignment 'modules/ai-role-assignment.bicep' = {
+  scope: rgAi
+  name: 'aiRoleAssignmentDeployment'
+  params: {
+    principalId: userAssignedIdentity.outputs.principalId
   }
 }
 
