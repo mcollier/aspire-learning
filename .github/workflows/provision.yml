@@ -53,7 +53,7 @@ jobs:
             template: ./infra/main.bicep
             parameters: environmentName=${{vars.ENVIRONMENT_NAME}} location=eastus
 
-        - run: echo ${{ steps.bicep-deploy.outputs.outputs }}
+        - run: echo ${{ steps.bicep-deploy.outputs.USER_ASSIGNED_IDENTITY_NAME }}
 
         - name: Azure CLI logout
           run: az logout
