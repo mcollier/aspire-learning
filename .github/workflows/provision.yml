@@ -30,17 +30,30 @@ jobs:
             tenant-id: ${{ secrets.AZURE_TENANT_ID }}
             subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
-        - name: Provision Azure resources
-          uses: azure/bicep-deploy@v1
+        # - name: Provision Azure resources
+        #   uses: azure/bicep-deploy@v1
+        #   with:
+        #     type: deployment
+        #     operation: create
+        #     name: 'AspireLearningInfraDeployment-${{ github.run_id }}'
+        #     location: eastus
+        #     scope: subscription
+        #     subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+        #     template-file: ./infra/main.bicep
+        #     parameters: '{"environmentName": "${{vars.ENVIRONMENT_NAME}}", "location": "eastus"}'
+
+        - id: bicep-deploy
+          name: "Bicep deployment - Provision Azure resources"
+          uses: azure/arm-deploy@v1
           with:
-            type: deployment
-            operation: create
-            name: 'AspireLearningInfraDeployment-${{ github.run_id }}'
-            location: eastus
+            deploymentName: 'AspireLearningInfraDeployment-${{ github.run_id }}'
             scope: subscription
-            subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-            template-file: ./infra/main.bicep
+            subscriptionId: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+            region: eastus
+            template: ./infra/main.bicep
             parameters: '{"environmentName": "${{vars.ENVIRONMENT_NAME}}", "location": "eastus"}'
+
+        - run: echo ${{ steps.bicep-deploy.outputs.outputs }}
 
         - name: Azure CLI logout
           run: az logout
