@@ -35,6 +35,10 @@ jobs:
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
+      # TODO: Set up a semantic version strategy for the container image
+      # TODO: Consider switching to legacy ARM deployment tasks
+      #       - https://github.com/Azure/bicep-deploy/issues/88
+      #       - https://github.com/Azure/bicep-deploy/issues/96
       - name: Deploy ServiceBusWorker to Container App
         uses: azure/bicep-deploy@v1
         with:
