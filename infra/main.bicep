@@ -48,6 +48,14 @@ resource rgAi 'Microsoft.Resources/resourceGroups@2021-04-01' existing = {
   name: 'rg-openai-upskilling'
 }
 
+module appInsightsComponent 'br/public:avm/res/insights/component:0.4.2' = {
+  scope: rg
+  name: 'appInsightsComponentDeployment'
+  params: {
+    name: '${abbrs.insightsComponents}${resourceToken}'
+    workspaceResourceId: workspace.outputs.resourceId
+  }
+}
 module workspace 'br/public:avm/res/operational-insights/workspace:0.9.0' = {
   scope: rg
   name: 'logAnalyticsWorkspaceDeployment'
@@ -65,6 +73,7 @@ module managedEnvironment 'br/public:avm/res/app/managed-environment:0.8.1' = {
   params: {
     name: !empty(containerAppEnvName) ? containerAppEnvName : '${abbrs.appManagedEnvironments}${resourceToken}'
     logAnalyticsWorkspaceResourceId: workspace.outputs.resourceId
+    appInsightsConnectionString: appInsightsComponent.outputs.connectionString
     zoneRedundant: false
   }
 }

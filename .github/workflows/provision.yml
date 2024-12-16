@@ -11,6 +11,9 @@ on:
     branches:
       - main
 
+env:
+  PREFIX: 'INFRA_'
+
 permissions:
     id-token: write
     contents: read
@@ -30,30 +33,54 @@ jobs:
             tenant-id: ${{ secrets.AZURE_TENANT_ID }}
             subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
-        # - name: Provision Azure resources
-        #   uses: azure/bicep-deploy@v1
-        #   with:
-        #     type: deployment
-        #     operation: create
-        #     name: 'AspireLearningInfraDeployment-${{ github.run_id }}'
-        #     location: eastus
-        #     scope: subscription
-        #     subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-        #     template-file: ./infra/main.bicep
-        #     parameters: '{"environmentName": "${{vars.ENVIRONMENT_NAME}}", "location": "eastus"}'
-
-        - id: bicep-deploy
-          name: "Bicep deployment - Provision Azure resources"
-          uses: azure/arm-deploy@v2
+        - name: Provision Azure resources
+          uses: azure/bicep-deploy@v1
           with:
-            deploymentName: 'AspireLearningInfraDeployment-${{ github.run_id }}'
+            type: deployment
+            operation: create
+            name: 'AspireLearningInfraDeployment-${{ github.run_id }}'
+            location: eastus
             scope: subscription
-            subscriptionId: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-            region: eastus
-            template: ./infra/main.bicep
-            parameters: environmentName=${{vars.ENVIRONMENT_NAME}} location=eastus
+            subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+            template-file: ./infra/main.bicep
+            parameters: '{"environmentName": "${{vars.ENVIRONMENT_NAME}}", "location": "eastus"}'
 
-        - run: echo ${{ steps.bicep-deploy.outputs.USER_ASSIGNED_IDENTITY_NAME }}
+        # - id: bicep-deploy
+        #   name: "Bicep deployment - Provision Azure resources"
+        #   uses: azure/arm-deploy@v2
+        #   with:
+        #     deploymentName: 'AspireLearningInfraDeployment-${{ github.run_id }}'
+        #     scope: subscription
+        #     subscriptionId: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+        #     region: eastus
+        #     template: ./infra/main.bicep
+        #     parameters: environmentName=${{vars.ENVIRONMENT_NAME}} location=eastus
+
+      #   - run: echo ${{ steps.bicep-deploy.outputs.USER_ASSIGNED_IDENTITY_NAME }}
+
+      #   - name: Convert Bicep outputs to env-vars.json
+      #     env:
+      #       ENV_VARS_JSON: ${{ toJSON(steps.bicep-deploy.outputs) }}
+      #     run: |
+      #       # non-string outputs are stringified by GitHub Actions - parse the values as JSON when possible
+      #       jq -re 'to_entries | map({(.key): (.value | fromjson? // .)}) | add' <<< "$ENV_VARS_JSON" > env-vars.json
+
+      #   - name: Upload env-vars
+      #     uses: actions/upload-artifact@v4
+      #     with:
+      #       name: env-vars-json
+      #       path: env-vars.json
+      #       if-no-files-found: error
+      #       overwrite: true
+
+      #   # Make Bicep outputs available as prefixed env vars
+      # # In other workflows, remember to download the artifact above first
+      #   - name: JSON to variables
+      #     shell: bash
+      #     run: |
+      #       cat bicep-output.json | jq -r '[paths(scalars) as $path | {"key": $path | map(if type == "number" then tostring else . end) | join("_"), "value": getpath($path)}] | map("\(.key)=\(.value)") | .[]' | while read line;do
+      #         echo "${{ env.PREFIX }}${line}" >> $GITHUB_ENV
+      #       done
 
         - name: Azure CLI logout
           run: az logout
