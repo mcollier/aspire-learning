@@ -48,13 +48,13 @@ jobs:
 
         - name: Show output
           run: |
-            echo "ACR Name: ${{ env.INFRA_ACR_NAME }}"
-            echo "Resource Group Name: ${{ env.INFRA_RESOURCE_GROUP_NAME }}"
-            echo "Managed Environment Name: ${{ env.INFRA_MANAGED_ENVIRONMENT_NAME }}"
+            echo "ACR Name: ${{ env.INFRA_acrName }}"
+            echo "Resource Group Name: ${{ env.INFRA_resourceGroupName }}"
+            echo "Managed Environment Name: ${{ env.INFRA_managedEnvironmentName }}"
             
         - name: Login to Azure Container Registry
           run: |
-            az acr login --name ${{ env.INFRA_ACR_NAME }}
+            az acr login --name ${{ env.INFRA_acrName }}
         
         #  Service Bus Worker
         - name: Build Docker image for ServiceBusWorker
@@ -63,11 +63,11 @@ jobs:
 
         - name: Create alias for the ServiceBusWorker
           run: |
-            docker tag servicebusworker:${{ github.sha }} ${{ env.INFRA_ACR_NAME }}.azurecr.io/service-bus-worker:${{ github.sha }}
+            docker tag servicebusworker:${{ github.sha }} ${{ env.INFRA_acrName }}.azurecr.io/service-bus-worker:${{ github.sha }}
 
         - name: Push ServiceBusWorker image to Azure Container Registry
           run: |
-            docker push ${{ env.INFRA_ACR_NAME }}.azurecr.io/service-bus-worker:${{ github.sha }}
+            docker push ${{ env.INFRA_acrName }}.azurecr.io/service-bus-worker:${{ github.sha }}
 
 
         #  Web App
@@ -77,8 +77,8 @@ jobs:
         
         - name: Create alias for the Web App
           run: |
-            docker tag webapplication1:${{ github.sha }} ${{ env.INFRA_ACR_NAME }}.azurecr.io/web-app:${{ github.sha }}
+            docker tag webapplication1:${{ github.sha }} ${{ env.INFRA_acrName }}.azurecr.io/web-app:${{ github.sha }}
 
         - name: Push Web App image to Azure Container Registry
           run: |
-            docker push ${{ env.INFRA_ACR_NAME }}.azurecr.io/web-app:${{ github.sha }}
+            docker push ${{ env.INFRA_acrName }}.azurecr.io/web-app:${{ github.sha }}
