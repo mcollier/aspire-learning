@@ -6,11 +6,16 @@ on:
     workflow_call:
     push:
 
+permissions:
+    id-token: write
+    contents: read
+
 jobs:
     publish_image:
         uses: ./.github/workflows/worker_publish_image.yml
 
     deploy_image:
+        needs: [publish_image]
         runs-on: ubuntu-latest
 
         steps:
