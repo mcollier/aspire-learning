@@ -30,6 +30,7 @@
 		"vscode": {
 			"extensions": [
 				"azurite.azurite",
+				"davidanson.vscode-markdownlint",
 				"github.vscode-github-actions",
 				"humao.rest-client",
 				"ms-dotnettools.csdevkit@prerelease"

@@ -1,0 +1,31 @@
+name: Deploy Worker App to Container App
+
+on:
+    workflow_dispatch:
+    # Allow to be called from other workflows.
+    workflow_call:
+    push:
+
+jobs:
+    publish_image:
+        uses: ./.github/workflows/worker_publish_image.yml
+
+    deploy_image:
+        runs-on: ubuntu-latest
+
+        steps:
+        
+        - name: Azure authentication
+          uses: azure/login@v1
+          with:
+            client-id: ${{ secrets.AZURE_CLIENT_ID }}
+            tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+            subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+        - name: Deploy Service Bus Worker to Container App
+          uses: azure/container-apps-deploy-action@v1
+          with:
+            acrName: ${{ vars.INFRA_ACR_NAME }}
+            containerAppName: 'worker-app'
+            resourceGroup: ${{ vars.RESOURCE_GROUP_NAME }}
+            imageToDeploy: ${{ vars.INFRA_ACR_NAME }}.azurecr.io/service-bus-worker:${{ github.sha }}
