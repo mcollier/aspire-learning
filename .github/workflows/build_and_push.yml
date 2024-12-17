@@ -2,6 +2,12 @@ name: Build and Push to ACR
 on:
     # Allow to be called from other workflows.
     workflow_call:
+    workflow_dispatch:
+      inputs:
+        deployment_run_id:
+          description: 'The run ID of the deployment workflow.'
+          required: true
+          type: number
 
 permissions:
     id-token: write
@@ -27,6 +33,25 @@ jobs:
           with:
               dotnet-version: '9.0.x'
 
+        - name: Download environment variables
+          uses: actions/download-artifact@v4
+          with:
+            name: env-vars-json
+            github-token: ${{ github.token }}
+            run-id: ${{ inputs.deployment_run_id || github.run_id}}
+
+        - name: JSON to variables
+          uses: antifree/json-to-variables@v1.2.0
+          with:
+            filename: env-vars.json
+            prefix: INFRA
+
+        - name: Show output
+          run: |
+            echo $INFRA_ACR_NAME
+            echo $INFRA_RESOURCE_GROUP_NAME
+            echo $INFRA_MANAGED_ENVIRONMENT_NAME
+            
         - name: Login to Azure Container Registry
           run: |
              az acr login --name ${{ vars.INFRA_ACR_NAME }}
