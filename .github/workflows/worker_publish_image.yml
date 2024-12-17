@@ -2,11 +2,6 @@ on:
     workflow_dispatch:
     # Allow to be called from other workflows.
     workflow_call:
-    # push:
-
-permissions:
-    id-token: write
-    contents: read
 
 jobs:
     build_image:
