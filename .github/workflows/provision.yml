@@ -82,7 +82,7 @@ jobs:
         - name: JSON to variables
           shell: bash
           run: |
-            cat bicep-output.json | jq -r '[paths(scalars) as $path | {"key": $path | map(if type == "number" then tostring else . end) | join("_"), "value": getpath($path)}] | map("\(.key)=\(.value)") | .[]' | while read line;do
+            cat env-vars.json | jq -r '[paths(scalars) as $path | {"key": $path | map(if type == "number" then tostring else . end) | join("_"), "value": getpath($path)}] | map("\(.key)=\(.value)") | .[]' | while read line;do
               echo "${{ env.PREFIX }}${line}" >> $GITHUB_ENV
             done
 
