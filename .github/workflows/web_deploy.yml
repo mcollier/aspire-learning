@@ -5,9 +5,9 @@ on:
     # Allow to be called from other workflows.
     workflow_call:
     push:
-        # branches: [main]
-        # paths:
-        #     - 'src/WebApplication1/**'
+        branches: [main]
+        paths:
+            - 'src/WebApplication1/**'
 
 permissions:
     id-token: write
