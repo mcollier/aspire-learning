@@ -1,4 +1,4 @@
-name: Deploy Worker App to Container App
+name: Deploy Web App to Container App
 
 on:
     workflow_dispatch:
@@ -7,7 +7,7 @@ on:
     push:
         branches: [main]
         paths:
-            - 'src/ServiceBusWorker/**'
+            - 'src/WebApplication1/**'
 
 permissions:
     id-token: write
@@ -15,7 +15,7 @@ permissions:
 
 jobs:
     publish_image:
-        uses: ./.github/workflows/worker_publish_image.yml
+        uses: ./.github/workflows/web_publish_image.yml
         secrets: inherit
 
     deploy_image:
@@ -23,7 +23,7 @@ jobs:
         runs-on: ubuntu-latest
 
         steps:
-        
+
         - name: Azure authentication
           uses: azure/login@v1
           with:
@@ -35,9 +35,9 @@ jobs:
           uses: azure/container-apps-deploy-action@v1
           with:
             acrName: ${{ vars.INFRA_ACR_NAME }}
-            containerAppName: 'worker-app'
+            containerAppName: 'web-app'
             resourceGroup: ${{ vars.RESOURCE_GROUP_NAME }}
-            imageToDeploy: ${{ vars.INFRA_ACR_NAME }}.azurecr.io/service-bus-worker:${{ github.sha }}
+            imageToDeploy: ${{ vars.INFRA_ACR_NAME }}.azurecr.io/web-app:${{ github.sha }}
 
         - name: Azure CLI logout
           run: az logout

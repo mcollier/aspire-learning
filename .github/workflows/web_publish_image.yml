@@ -1,4 +1,4 @@
-name: Worker Publish Image
+name: Web Publish Image
 on:
     workflow_dispatch:
     # Allow to be called from other workflows.
@@ -28,18 +28,18 @@ jobs:
           run: |
                 az acr login --name ${{ vars.INFRA_ACR_NAME }}
         
-        #  Service Bus Worker
-        - name: Build Docker image for ServiceBusWorker
+         #  Web App
+        - name: Build Docker image for Web App
           run: dotnet publish --os linux --arch x64 /t:PublishContainer -p ContainerImageTag="${{ github.sha }}"
-          working-directory: src/ServiceBusWorker
-
-        - name: Create alias for the ServiceBusWorker
-          run: |
-            docker tag servicebusworker:${{ github.sha }} ${{ vars.INFRA_ACR_NAME }}.azurecr.io/service-bus-worker:${{ github.sha }}
-
-        - name: Push ServiceBusWorker image to Azure Container Registry
-          run: |
-            docker push ${{ vars.INFRA_ACR_NAME }}.azurecr.io/service-bus-worker:${{ github.sha }}
+          working-directory: src/WebApplication1
         
+        - name: Create alias for the Web App
+          run: |
+            docker tag webapplication1:${{ github.sha }} ${{ vars.INFRA_ACR_NAME }}.azurecr.io/web-app:${{ github.sha }}
+
+        - name: Push Web App image to Azure Container Registry
+          run: |
+            docker push ${{ vars.INFRA_ACR_NAME }}.azurecr.io/web-app:${{ github.sha }}
+
         - name: Azure CLI logout
           run: az logout
