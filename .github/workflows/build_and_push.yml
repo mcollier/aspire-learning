@@ -48,13 +48,13 @@ jobs:
 
         - name: Show output
           run: |
-            echo $INFRA_ACR_NAME
-            echo $INFRA_RESOURCE_GROUP_NAME
-            echo $INFRA_MANAGED_ENVIRONMENT_NAME
+            echo "ACR Name: $INFRA_ACR_NAME"
+            echo "Resource Group Name: $INFRA_RESOURCE_GROUP_NAME"
+            echo "Managed Environment Name: $INFRA_MANAGED_ENVIRONMENT_NAME"
             
         - name: Login to Azure Container Registry
           run: |
-             az acr login --name ${{ vars.INFRA_ACR_NAME }}
+            az acr login --name $INFRA_ACR_NAME
         
         #  Service Bus Worker
         - name: Build Docker image for ServiceBusWorker
