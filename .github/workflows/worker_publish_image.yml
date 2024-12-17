@@ -4,6 +4,10 @@ on:
     workflow_call:
     # push:
 
+permissions:
+    id-token: write
+    contents: read
+
 jobs:
     build_image:
         runs-on: ubuntu-latest
