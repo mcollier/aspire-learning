@@ -35,18 +35,6 @@ jobs:
             tenant-id: ${{ secrets.AZURE_TENANT_ID }}
             subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
-        # - name: Provision Azure resources
-        #   uses: azure/bicep-deploy@v1
-        #   with:
-        #     type: deployment
-        #     operation: create
-        #     name: 'AspireLearningInfraDeployment-${{ github.run_id }}'
-        #     location: eastus
-        #     scope: subscription
-        #     subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-        #     template-file: ./infra/main.bicep
-        #     parameters: '{"environmentName": "${{vars.ENVIRONMENT_NAME}}", "location": "eastus"}'
-
         # See https://devblogs.microsoft.com/ise/three-ways-to-simplify-cicd-pipelines-on-github-actions/
 
         - id: bicep-deploy
@@ -59,8 +47,6 @@ jobs:
             region: eastus
             template: ./infra/main.bicep
             parameters: environmentName=${{vars.ENVIRONMENT_NAME}} location=eastus
-
-      #   - run: echo ${{ steps.bicep-deploy.outputs.USER_ASSIGNED_IDENTITY_NAME }}
 
         - name: Convert Bicep outputs to env-vars.json
           env:
