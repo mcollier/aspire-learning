@@ -148,6 +148,7 @@ module storageAccount 'br/public:avm/res/storage/storage-account:0.15.0' = {
 }
 
 output resourceGroupName string = rg.name
+output storageAccountName string = storageAccount.outputs.name
 output acrName string = acr.outputs.name
 output userAssignedIdentityName string = userAssignedIdentity.outputs.name
 output managedEnvironmentName string = managedEnvironment.outputs.name
