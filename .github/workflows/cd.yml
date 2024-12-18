@@ -16,9 +16,6 @@ jobs:
     uses: ./.github/workflows/provision.yml
     secrets: inherit
 
-    # TODO: Fix this.  The steps below depend on the Azure resources provisioned in provision.yml.
-    #       Currently use GitHub repo variables.
-
   push_to_acr:
     needs: [deploy_infra]
     uses: ./.github/workflows/build_and_push.yml
