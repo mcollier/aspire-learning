@@ -50,14 +50,14 @@ jobs:
         with:
           filename: env-vars.json
           prefix: INFRA
-          
+
       # TDO: Set up a better image version strategy for the container image.
           
       - name: "Deploy ServiceBusWorker to Container App"
         uses: azure/arm-deploy@v2
         with:
           deploymentName: 'ServiceBusWorkerDeployment-${{ github.run_id }}'
-          scope: resourceGroup
+          scope: resourcegroup
           resourceGroupName: ${{ env.INFRA_resourceGroupName}}
           template: ./infra/worker-app.bicep
           parameters: blobConnectionString=https://${{ env.INFRA_storageAccountName}}.blob.core.windows.net 
@@ -74,7 +74,7 @@ jobs:
         uses: azure/arm-deploy@v2
         with:
           deploymentName: 'WebAppDeployment-${{ github.run_id }}'
-          scope: resourceGroup
+          scope: resourcegroup
           resourceGroupName: ${{ env.INFRA_resourceGroupName}}
           template: ./infra/web-app.bicep
           parameters: imageName=${{ env.INFRA_acrName}}.azurecr.io/web-app:${{ github.sha }} 
@@ -84,29 +84,9 @@ jobs:
                       serviceBusConnectionString=${{ env.INFRA_serviceBusEndpoint}}.servicebus.windows.net 
                       serviceBusQueueName=${{ vars.INFRA_SERVICE_BUS_QUEUE_NAME }}
 
-  #     # TODO: Consider switching to legacy ARM deployment tasks
-  #     #       - https://github.com/Azure/bicep-deploy/issues/88
-  #     #       - https://github.com/Azure/bicep-deploy/issues/96
+      - name: Azure CLI logout
+        run: az logout
 
-
-  #     - name: Deploy Web App to Container App
-  #       uses: azure/bicep-deploy@v1
-  #       with:
-  #         type: deployment
-  #         operation: create
-  #         name: 'WebAppDeployment-${{ github.run_id }}'
-  #         scope: resourceGroup
-  #         subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-  #         resource-group-name: ${{ vars.RESOURCE_GROUP_NAME }}
-  #         template-file: ./infra/web-app.bicep
-  #         parameters: '{
-  #          "imageName": "${{ vars.INFRA_ACR_NAME }}.azurecr.io/web-app:${{ github.sha }}",
-  #          "managedEnvironmentName": "${{ vars.INFRA_MANAGED_ENVIRONMENT_NAME }}",
-  #          "userAssignedIdentityName": "${{vars.USER_ASSIGNED_IDENTITY_NAME}}",
-  #          "registryName": "${{vars.INFRA_ACR_NAME}}",
-  #          "serviceBusConnectionString": "${{vars.INFRA_SERVICE_BUS_NAMESPACE_NAME}}.servicebus.windows.net",
-  #          "serviceBusQueueName": "${{vars.INFRA_SERVICE_BUS_QUEUE_NAME}}"
-  #          }'
-
-      # - name: Azure CLI logout
-      #   run: az logout
+    #   TODO: Consider switching to legacy ARM deployment tasks
+    # - https://github.com/Azure/bicep-deploy/issues/88
+    # - https://github.com/Azure/bicep-deploy/issues/96
