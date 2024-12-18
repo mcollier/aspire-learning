@@ -1,0 +1,17 @@
+@host = localhost:35201
+
+GET https://{{host}}/weatherforecast
+
+###
+POST https://{{host}}/cargo
+Content-Type: application/json
+
+{
+  "id": 1,
+  "Name": "Test Name",
+  "Weight": 100,
+  "Destination": "Test Destination"
+}
+
+
+

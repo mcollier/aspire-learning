@@ -1,0 +1,92 @@
+name: Continuous Deployment
+
+on:
+  # Allow triggering manually. 
+  workflow_dispatch:
+  push: 
+    branches:
+      - main
+
+permissions:
+    id-token: write
+    contents: read
+jobs:
+  ci:
+    uses: ./.github/workflows/ci.yml
+
+  deploy_infra:
+    needs: [ci]
+    uses: ./.github/workflows/provision.yml
+    secrets: inherit
+
+  push_to_acr:
+    needs: [deploy_infra]
+    uses: ./.github/workflows/build_and_push.yml
+    secrets: inherit
+
+  deploy_to_container_app:
+    needs: [push_to_acr]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@main
+
+      - name: Azure authentication
+        uses: azure/login@v1
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Download environment variables
+        uses: actions/download-artifact@v4
+        with:
+          name: env-vars-json
+          github-token: ${{ github.token }}
+          run-id: ${{ inputs.deployment_run_id || github.run_id}}
+
+      - name: JSON to variables
+        uses: antifree/json-to-variables@v1.2.0
+        with:
+          filename: env-vars.json
+          prefix: INFRA
+
+      # TODO: Set up a better image version strategy for the container image.
+          
+      - name: "Deploy ServiceBusWorker to Container App"
+        uses: azure/arm-deploy@v2
+        with:
+          deploymentName: 'ServiceBusWorkerDeployment-${{ github.run_id }}'
+          scope: resourcegroup
+          resourceGroupName: ${{ env.INFRA_resourceGroupName}}
+          template: ./infra/worker-app.bicep
+          parameters: blobConnectionString=https://${{ env.INFRA_storageAccountName}}.blob.core.windows.net 
+                      imageName=${{ env.INFRA_acrName}}.azurecr.io/service-bus-worker:${{ github.sha }} 
+                      managedEnvironmentName=${{ env.INFRA_managedEnvironmentName }} 
+                      openAIConnectionString=https://${{ vars.INFRA_AZURE_OPENAI_MODEL_DEPLOYMENT_NAME}}.openai.azure.com/ 
+                      openAIModelDeploymentName=${{ vars.INFRA_AZURE_OPENAI_MODEL_DEPLOYMENT_NAME }} 
+                      registryName=${{ env.INFRA_acrName }} 
+                      serviceBusConnectionString=${{ env.INFRA_serviceBusEndpoint}}.servicebus.windows.net 
+                      serviceBusQueueName=${{ vars.INFRA_SERVICE_BUS_QUEUE_NAME }} 
+                      userAssignedIdentityName=${{ env.INFRA_userAssignedIdentityName }}
+
+      - name: "Deploy WebApp to Container App"
+        uses: azure/arm-deploy@v2
+        with:
+          deploymentName: 'WebAppDeployment-${{ github.run_id }}'
+          scope: resourcegroup
+          resourceGroupName: ${{ env.INFRA_resourceGroupName}}
+          template: ./infra/web-app.bicep
+          parameters: imageName=${{ env.INFRA_acrName}}.azurecr.io/web-app:${{ github.sha }} 
+                      managedEnvironmentName=${{ env.INFRA_managedEnvironmentName }} 
+                      userAssignedIdentityName=${{ env.INFRA_userAssignedIdentityName }} 
+                      registryName=${{ env.INFRA_acrName }} 
+                      serviceBusConnectionString=${{ env.INFRA_serviceBusEndpoint}}.servicebus.windows.net 
+                      serviceBusQueueName=${{ vars.INFRA_SERVICE_BUS_QUEUE_NAME }}
+
+      - name: Azure CLI logout
+        run: az logout
+
+    #   TODO: Consider switching to legacy ARM deployment tasks
+    # - https://github.com/Azure/bicep-deploy/issues/88
+    # - https://github.com/Azure/bicep-deploy/issues/96

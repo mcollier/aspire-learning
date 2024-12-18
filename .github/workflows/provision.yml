@@ -1,0 +1,72 @@
+name: Provision Azure resources
+
+on: 
+  # Allow to be called from other workflows.
+  workflow_call:
+
+  # Allow triggering manually. 
+  workflow_dispatch:
+  
+env:
+  PREFIX: 'INFRA_'
+
+permissions:
+    id-token: write
+    contents: read
+
+jobs:
+  # TODO: Figure out way to save the Bicep output so can be used in other workflows.
+  #       Save to GitHub environment variables?  GitHub CLI?
+    provision-azure:
+        runs-on: ubuntu-latest
+        steps:
+
+        - name: Checkout repository
+          uses: actions/checkout@main
+
+        - name: Azure authentication
+          uses: azure/login@v1
+          with:
+            client-id: ${{ secrets.AZURE_CLIENT_ID }}
+            tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+            subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+        # See https://devblogs.microsoft.com/ise/three-ways-to-simplify-cicd-pipelines-on-github-actions/
+
+        - id: bicep-deploy
+          name: "Bicep deployment - Provision Azure resources"
+          uses: azure/arm-deploy@v2
+          with:
+            deploymentName: 'AspireLearningInfraDeployment-${{ github.run_id }}'
+            scope: subscription
+            subscriptionId: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+            region: eastus
+            template: ./infra/main.bicep
+            parameters: environmentName=${{vars.ENVIRONMENT_NAME}} location=eastus
+
+        - name: Convert Bicep outputs to env-vars.json
+          env:
+            ENV_VARS_JSON: ${{ toJSON(steps.bicep-deploy.outputs) }}
+          run: |
+            # non-string outputs are stringified by GitHub Actions - parse the values as JSON when possible
+            jq -re 'to_entries | map({(.key): (.value | fromjson? // .)}) | add' <<< "$ENV_VARS_JSON" > env-vars.json
+
+        - name: Upload env-vars
+          uses: actions/upload-artifact@v4
+          with:
+            name: env-vars-json
+            path: env-vars.json
+            if-no-files-found: error
+            overwrite: true
+
+        # Make Bicep outputs available as prefixed env vars
+        # In other workflows, remember to download the artifact above first
+        - name: JSON to variables
+          shell: bash
+          run: |
+            cat env-vars.json | jq -r '[paths(scalars) as $path | {"key": $path | map(if type == "number" then tostring else . end) | join("_"), "value": getpath($path)}] | map("\(.key)=\(.value)") | .[]' | while read line;do
+              echo "${{ env.PREFIX }}${line}" >> $GITHUB_ENV
+            done
+
+        - name: Azure CLI logout
+          run: az logout

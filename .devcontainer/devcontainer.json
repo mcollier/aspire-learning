@@ -1,0 +1,65 @@
+// For format details, see https://aka.ms/devcontainer.json. For config options, see the
+// README at: https://github.com/devcontainers/templates/tree/main/src/dotnet
+{
+	"name": ".NET Aspire Learning",
+	// Or use a Dockerfile or Docker Compose file. More info: https://containers.dev/guide/dockerfile
+	"image": "mcr.microsoft.com/devcontainers/dotnet:9.0-bookworm",
+	// Features to add to the dev container. More info: https://containers.dev/features.
+	"features": {
+		"ghcr.io/devcontainers/features/azure-cli:1": {
+			"installBicep": true,
+			"version": "latest"
+		},
+		"ghcr.io/devcontainers/features/github-cli:1": {
+			"installDirectlyFromGitHubRelease": true,
+			"version": "latest"
+		},
+		"ghcr.io/azure/azure-dev/azd:0": {
+			"version": "stable"
+		},
+		"ghcr.io/devcontainers/features/docker-in-docker:2": {},
+		"ghcr.io/devcontainers/features/powershell": {
+			"version": "latest"
+		},
+		"ghcr.io/devcontainers/features/common-utils": {
+			"version": "latest"
+		}
+	},
+	// Configure tool-specific properties.
+	"customizations": {
+		"vscode": {
+			"extensions": [
+				"azurite.azurite",
+				"bierner.markdown-emoji",
+				"davidanson.vscode-markdownlint",
+				"github.vscode-github-actions",
+				"humao.rest-client",
+				"ms-dotnettools.csdevkit@prerelease",
+			],
+			"settings": {
+				"dotnet.defaultSolution": "src/AspireApp1.sln"
+			}
+		}
+	},
+	"onCreateCommand": "cd src && dotnet restore",
+	"postStartCommand": "dotnet dev-certs https --trust",
+	// Use 'forwardPorts' to make a list of ports inside the container available locally.
+	"forwardPorts": [
+		// 17096
+	]
+	// "portsAttributes": {
+	// 	"15306": {
+	// 		"label": "Application",
+	// 		"onAutoForward": "notify"
+	// 	}
+	// }
+	// "portsAttributes": {
+	//		"5001": {
+	//			"protocol": "https"
+	//		}
+	// }
+	// Use 'postCreateCommand' to run commands after the container is created.
+	// "postCreateCommand": "dotnet restore",
+	// Uncomment to connect as root instead. More info: https://aka.ms/dev-containers-non-root.
+	// "remoteUser": "root"
+}
