@@ -9,6 +9,12 @@ string tenantId = builder.Configuration["Parameters:AZURE_TENANT_ID"] ?? throw n
 
 string deploymentName = builder.Configuration["Parameters:openai-deployment-name"] ?? throw new InvalidOperationException("openai-deployment-name is not defined");
 
+// var blobs = builder.ExecutionContext.IsPublishMode
+//     ? builder.AddAzureStorage("storage").AddBlobs("blobs")
+//     : builder.AddConnectionString("blobs");
+
+// builder.AddAzureStorage("storage").RunAsEmulator();
+
 // Get reference to existing Blob storage endpoint.
 var blobs = builder.AddConnectionString("blobs");
 
