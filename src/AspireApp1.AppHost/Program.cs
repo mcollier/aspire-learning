@@ -1,6 +1,6 @@
 var builder = DistributedApplication.CreateBuilder(args);
 
-// Get the Service Bus queue name and use an an environment variable to the worker.
+// Get the Service Bus queue name and use as an environment variable to the worker.
 string queueName = builder.Configuration["Parameters:service-bus-queue-name"] ?? throw new InvalidOperationException("service-bus-queue-name is not defined");
 
 // Get the Azure Tenant ID and use an an environment variable to the worker.

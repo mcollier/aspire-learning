@@ -51,7 +51,7 @@ jobs:
           filename: env-vars.json
           prefix: INFRA
 
-      # TDO: Set up a better image version strategy for the container image.
+      # TODO: Set up a better image version strategy for the container image.
           
       - name: "Deploy ServiceBusWorker to Container App"
         uses: azure/arm-deploy@v2
