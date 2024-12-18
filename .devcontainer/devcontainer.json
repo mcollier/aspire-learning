@@ -30,10 +30,11 @@
 		"vscode": {
 			"extensions": [
 				"azurite.azurite",
+				"bierner.markdown-emoji",
 				"davidanson.vscode-markdownlint",
 				"github.vscode-github-actions",
 				"humao.rest-client",
-				"ms-dotnettools.csdevkit@prerelease"
+				"ms-dotnettools.csdevkit@prerelease",
 			],
 			"settings": {
 				"dotnet.defaultSolution": "src/AspireApp1.sln"
