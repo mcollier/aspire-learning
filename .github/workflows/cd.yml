@@ -24,21 +24,36 @@ jobs:
     uses: ./.github/workflows/build_and_push.yml
     secrets: inherit
 
-    
+  deploy_to_container_app:
+    needs: [push_to_acr]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@main
 
-  # deploy_to_container_app:
-  #   needs: [push_to_acr]
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - name: Checkout repository
-  #       uses: actions/checkout@main
+      - name: Azure authentication
+        uses: azure/login@v1
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
-  #     - name: Azure authentication
-  #       uses: azure/login@v1
-  #       with:
-  #         client-id: ${{ secrets.AZURE_CLIENT_ID }}
-  #         tenant-id: ${{ secrets.AZURE_TENANT_ID }}
-  #         subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+      - name: "Deploy ServiceBusWorker to Container App"
+        uses: azure/arm-deploy@v2
+        with:
+          deploymentName: 'ServiceBusWorkerDeployment-${{ github.run_id }}'
+          scope: resourceGroup
+          resourceGroupName: ${{ env.INFRA_resourceGroupName}}
+          template: ./infra/worker-app.bicep
+          parameters: blobConnectionString=https://${{ env.INFRA_storageAccountName}}.blob.core.windows.net 
+                      imageName=${{ env.INFRA_acrName}}.azurecr.io/service-bus-worker:${{ github.sha }} 
+                      managedEnvironmentName=${{ env.INFRA_managedEnvironmentName }} 
+                      openAIConnectionString=https://${{ vars.INFRA_AZURE_OPENAI_MODEL_DEPLOYMENT_NAME}}.openai.azure.com/ 
+                      openAIModelDeploymentName=${{ vars.INFRA_AZURE_OPENAI_MODEL_DEPLOYMENT_NAME }} 
+                      registryName=${{ env.INFRA_acrName }} 
+                      serviceBusConnectionString=${{ env.INFRA_serviceBusEndpoint}}.servicebus.windows.net 
+                      serviceBusQueueName=${{ vars.INFRA_SERVICE_BUS_QUEUE_NAME }} 
+                      userAssignedIdentityName=${{ env.INFRA_userAssignedIdentityName }}
 
   #     # TODO: Set up a semantic version strategy for the container image
   #     # TODO: Consider switching to legacy ARM deployment tasks
