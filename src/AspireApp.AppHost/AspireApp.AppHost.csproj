@@ -20,7 +20,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\ServiceBusWorker\ServiceBusWorker.csproj" />
-    <ProjectReference Include="..\WebApplication1\WebApplication1.csproj" />
+    <ProjectReference Include="..\MyWebApplication\MyWebApplication.csproj" />
   </ItemGroup>
 
 </Project>

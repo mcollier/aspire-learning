@@ -9,12 +9,12 @@ namespace ServiceBusWorker
 {
     public class Worker(ILogger<Worker> logger,
                         BlobServiceClient blobServiceClient,
-                        ServiceBusClient _serviceBusClient,
+                        ServiceBusClient serviceBusClient,
                         OpenAIClient openAIClient,
                         IConfiguration configuration) : BackgroundService
     {
         private readonly ILogger<Worker> _logger = logger;
-        private readonly ServiceBusClient _client = _serviceBusClient;
+        private readonly ServiceBusClient _client = serviceBusClient;
         private readonly BlobServiceClient _blobServiceClient = blobServiceClient;
         private readonly OpenAIClient _openAIClient = openAIClient;
         private ServiceBusProcessor _processor = null!; // Initialize with null-forgiving operator

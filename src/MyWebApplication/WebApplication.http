@@ -1,0 +1,16 @@
+@host_address = https://localhost:45461
+
+GET {{host_address}}/weatherforecast/
+Accept: application/json
+
+###
+
+POST {{host_address}}/cargo
+Content-Type: application/json
+
+{
+  "id": 1,
+  "Name": "Test Name",
+  "Weight": 100,
+  "Destination": "Test Destination"
+}
